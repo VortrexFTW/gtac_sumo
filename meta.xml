@@ -1,0 +1,8 @@
+<meta>
+	<info title="sumo" author="Vortrex" version="1.0" description="SUMO gamemode for GTA Connected" />
+
+	<script src="server.js" type="server" language="javascript" />
+	<script src="client.js" type="client" language="javascript" />
+	
+	<file type="client" src="fonts/pricedown.ttf" />
+</meta>
