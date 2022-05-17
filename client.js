@@ -2,10 +2,6 @@
 
 // ----------------------------------------------------------------------------
 
-setErrorMode(RESOURCEERRORMODE_STRICT);
-
-// ----------------------------------------------------------------------------
-
 let isInMatch = false;
 let isSpectating = false;
 let spectatingElement = null;
@@ -40,14 +36,14 @@ bindEventHandler("OnResourceReady", thisResource, function(event, resource) {
 		lobbyMapReadyFont = lucasFont.createFont(fontStream, 64.0);
 		fontStream.close();
 	}
-	
+
 	lobbyMapNameFont = lucasFont.createDefaultFont(36.0, "Roboto", "Light");
 	lobbyMapCreatorFont = lucasFont.createDefaultFont(16.0, "Roboto", "Light");
 	lobbyMapReadyHelpFont = lucasFont.createDefaultFont(12.0, "Roboto", "Light");
 	lobbyMapPlayersFont = lucasFont.createDefaultFont(12.0, "Roboto", "Light");
-	
+
 	triggerNetworkEvent("sumo.client");
-	
+
 	bindKey(SDLK_F1, KEYSTATE_UP, function() { triggerNetworkEvent("sumo.reload") });
 	bindKey(SDLK_SPACE, KEYSTATE_UP, function() { triggerNetworkEvent("sumo.ready") });
 	bindKey(SDLK_LCTRL, KEYSTATE_UP, function() { triggerNetworkEvent("sumo.spectator") });
@@ -56,7 +52,7 @@ bindEventHandler("OnResourceReady", thisResource, function(event, resource) {
 // ----------------------------------------------------------------------------
 
 addNetworkHandler("sumo.camera", function(x, y, z) {
-	
+
 });
 
 // ----------------------------------------------------------------------------
@@ -67,14 +63,14 @@ addNetworkHandler("sumo.spectate", function() {
 	//	gta.fadeCamera(true, 1, COLOUR_BLACK);
 	//	return false;
 	//}
-	
+
 	localPlayer.interior = 2;
 	localPlayer.position = lobbyCameraLookAt;
 	gta.setCameraLookAt(lobbyCameraPosition, lobbyCameraLookAt, true);
 	isSpectating = true;
 	isLobby = false;
 	spectatingElement = getElementFromId(elementId);
-	gta.fadeCamera(true, 1, COLOUR_BLACK);		
+	gta.fadeCamera(true, 1, COLOUR_BLACK);
 	console.log(getElementFromId(elementId));
 	gta.setCameraTarget(getElementFromId(elementId), true, CAMMODE_CIRCLE);
 });
@@ -94,11 +90,11 @@ addNetworkHandler("sumo.lobby", function(mapName, creatorName, cameraX, cameraY,
 	creatorNameText = creatorName;
 
 	isMatchAlreadyRunning = isMatchActive;
-	
+
 	setHUDEnabled(false);
-	
+
 	gta.time.minuteDuration = 99999;
-	
+
 	lobbyCameraPosition = new Vec3(cameraX, cameraY, cameraZ);
 	lobbyCameraLookAt = new Vec3(lookAtX, lookAtY, lookAtZ);
 	gta.setCameraLookAt(lobbyCameraPosition, lobbyCameraLookAt, true);
@@ -162,7 +158,7 @@ function changeUpVehicleAI(vehicle) {
 		} else {
 			vehicle.setCarMission(3);
 		}
-	}	
+	}
 
 	//let style = Math.round((Math.random() * 2));
 	//vehicle.setDrivingStyle(style);
@@ -184,7 +180,7 @@ addEventHandler("OnMouseUp", function(event, mouse, button) {
 			case 0:
 				triggerNetworkEvent("sumo.spectate.prev", spectatingElement);
 				break;
-		
+
 			case 1:
 				triggerNetworkEvent("sumo.spectate.next", spectatingElement);
 				break;
@@ -197,11 +193,11 @@ addEventHandler("OnMouseUp", function(event, mouse, button) {
 addEventHandler("OnDrawnHUD", function(event) {
 	if(isLobby) {
 		if(lobbyMapNameFont != null) {
-			lobbyMapNameFont.render(mapNameText, [0, 10], gta.width, 0.5, 0.0, lobbyMapNameFont.size, COLOUR_WHITE, false, false, false, true);		
+			lobbyMapNameFont.render(mapNameText, [0, 10], gta.width, 0.5, 0.0, lobbyMapNameFont.size, COLOUR_WHITE, false, false, false, true);
 		}
-		
+
 		if(lobbyMapCreatorFont != null) {
-			lobbyMapCreatorFont.render("Created by: " + creatorNameText, [0, 60], gta.width, 0.5, 0.0, lobbyMapCreatorFont.size, COLOUR_WHITE, false, false, false, true);		
+			lobbyMapCreatorFont.render("Created by: " + creatorNameText, [0, 60], gta.width, 0.5, 0.0, lobbyMapCreatorFont.size, COLOUR_WHITE, false, false, false, true);
 		}
 
 		if(lobbyMapReadyFont != null) {
@@ -211,8 +207,8 @@ addEventHandler("OnDrawnHUD", function(event) {
 				readyColour = COLOUR_YELLOW;
 				readyText = "PLEASE WAIT"
 			}
-			
-			lobbyMapReadyFont.render(readyText, [0, gta.height-150], gta.width, 0.5, 0.0, lobbyMapReadyFont.size, readyColour, false, false, false, true);		
+
+			lobbyMapReadyFont.render(readyText, [0, gta.height-150], gta.width, 0.5, 0.0, lobbyMapReadyFont.size, readyColour, false, false, false, true);
 		}
 
 		if(lobbyMapReadyHelpFont != null) {
@@ -220,8 +216,8 @@ addEventHandler("OnDrawnHUD", function(event) {
 			if(isMatchAlreadyRunning) {
 				helpText = "A match is already running. Please wait until it finishes or press SHIFT to spawn as spectator!";
 			}
-			lobbyMapReadyHelpFont.render(helpText, [0, gta.height-25], gta.width, 0.5, 0.0, lobbyMapReadyHelpFont.size, COLOUR_WHITE, false, false, false, true);		
-		}		
+			lobbyMapReadyHelpFont.render(helpText, [0, gta.height-25], gta.width, 0.5, 0.0, lobbyMapReadyHelpFont.size, COLOUR_WHITE, false, false, false, true);
+		}
 	}
 });
 

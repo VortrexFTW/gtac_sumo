@@ -2,10 +2,6 @@
 
 // ----------------------------------------------------------------------------
 
-setErrorMode(RESOURCEERRORMODE_STRICT);
-
-// ----------------------------------------------------------------------------
-
 let matchStarted = false;
 
 let matchStartTime = 0;
@@ -42,9 +38,9 @@ let lobbyCamera = [
 // ----------------------------------------------------------------------------
 
 let sumoSkins = [
-	null, 
-	84, 
-	0, 
+	null,
+	84,
+	0,
 	264
 ];
 
@@ -107,17 +103,17 @@ bindEventHandler("OnResourceStop", thisResource, function(event, resource) {
 // ----------------------------------------------------------------------------
 
 addEventHandler("OnPlayerJoined", function(event, client) {
-	message(String(client.name) + " has joined the server!", COLOUR_AQUA);
+	message(`${client.name} has joined the server!`, COLOUR_AQUA);
 });
 
 // ----------------------------------------------------------------------------
 
 addEventHandler("OnPlayerQuit", function(event, client) {
 	removePlayerFromMatch(client);
-	
-	message(String(client.name) + " left the server!", COLOUR_AQUA);
-	console.log("DISCONNECT: " + String(client.name) + " left the server!");
-	
+
+	message(`${client.name} left the server!`, COLOUR_AQUA);
+	console.log(`DISCONNECT: ${client.name} left the server!`);
+
 	if(remainingPlayers.length == 0) {
 		endMatch();
 	}
@@ -169,14 +165,14 @@ addEventHandler("OnProcess", function(event, deltaTime) {
 							removePlayerFromMatch(client);
 						}
 					}
-				}					
+				}
 			} else {
 				removePlayerFromMatch(remainingPlayer);
 			}
 		}
 	});
 
-	getElementsByType(ELEMENT_CIVILIAN).forEach(function(civilian) {
+	getElementsByType(ELEMENT_PED).forEach(function(civilian) {
 		if(civilian.vehicle == null) {
 			destroyElement(civilian);
 		}
@@ -186,7 +182,7 @@ addEventHandler("OnProcess", function(event, deltaTime) {
 	//	if(civilian.vehicle == null) {
 	//		destroyElement(civilian);
 	//	}
-	//});	
+	//});
 });
 
 // ----------------------------------------------------------------------------
@@ -194,7 +190,7 @@ addEventHandler("OnProcess", function(event, deltaTime) {
 function startMatchCountdown(timerStartValue) {
 	spawnAllPlayers();
 	matchCountdown = timerStartValue;
-	matchCountdownTimer = setTimeout(countdownToMatchStart, 1000);	
+	matchCountdownTimer = setTimeout(countdownToMatchStart, 1000);
 	matchStarted = true;
 }
 
@@ -214,7 +210,7 @@ function countdownToMatchStart() {
 // ----------------------------------------------------------------------------
 
 function countdownToMatchEnd() {
-	if(matchEndCountdown == 15) {		
+	if(matchEndCountdown == 15) {
 		message("Match ends in 25 seconds!", toColour(237, 67, 55, 255));
 		console.log("[SUMO] Match ends in 15 seconds!");
 		//clearTimeout(countdownToMatchEnd);
@@ -240,7 +236,7 @@ function spawnAllPlayers() {
 		destroyElement(vehicle);
 	});
 
-	remainingPlayers.forEach(function(remainingPlayer) {		
+	remainingPlayers.forEach(function(remainingPlayer) {
 		let spawnInfo = getRandomRemainingSpawn();
 		if(spawnInfo != false) {
 			let spawnPosition = spawnInfo.position;
@@ -248,24 +244,24 @@ function spawnAllPlayers() {
 			if(!matchMap.info.usesRadians) {
 				spawnHeading = degToRad(spawnHeading);
 			}
-			
+
 			let vehicleModel = getRandomVehicleModel();
 			if(bigSumoVehicles[server.game].indexOf(vehicleModel) != -1) {
 				spawnPosition = getPosInFrontOfPos(spawnPosition, spawnHeading, 3);
 				spawnPosition.z += 1.5;
 			}
-			
+
 			let vehicle = gta.createVehicle(vehicleModel, spawnPosition);
 			vehicle.heading = spawnHeading;
 			addToWorld(vehicle);
-			
+
 			spawnPlayer(remainingPlayer, spawnPosition, spawnHeading, sumoSkins[server.game], 0, 0);
 			remainingPlayer.player.warpIntoVehicle(vehicle, 0);
 			//remainingPlayer.setData("sumo.spawned", true, true);
 			triggerNetworkEvent("sumo.spawned", remainingPlayer);
 			triggerNetworkEvent("sumo.lockcontrols", null);
 		} else {
-			messageClient("The match is full! Spawning you as a spectator ...", toColour(237, 67, 55, 255));
+			messageClient(`The match is full! Spawning you as a spectator ...`, toColour(237, 67, 55, 255));
 			respawnAsSpectator(client);
 		}
 	});
@@ -277,7 +273,7 @@ function spawnAllPlayers() {
 			if(!matchMap.info.usesRadians) {
 				spawnHeading = degToRad(spawnHeading);
 			}
-			
+
 			let vehicleModel = getRandomVehicleModel();
 			if(bigSumoVehicles[server.game].indexOf(vehicleModel) != -1) {
 				spawnPosition = getPosInFrontOfPos(spawnPosition, spawnHeading, 3);
@@ -287,7 +283,7 @@ function spawnAllPlayers() {
 			let vehicle = gta.createVehicle(vehicleModel, spawnPosition);
 			vehicle.heading = spawnHeading;
 			addToWorld(vehicle);
-			
+
 			let civilian = gta.createCivilian(sumoSkins[server.game], spawnPosition);
 			civilian.position = spawnPosition;
 			addToWorld(civilian);
@@ -297,7 +293,7 @@ function spawnAllPlayers() {
 			vehicle.setData("sumo.ai", true, true);
 		});
 	}
-	console.log("[SUMO] All players spawned!");
+	console.log(`[SUMO] All players spawned!`);
 }
 
 // ----------------------------------------------------------------------------
@@ -323,7 +319,7 @@ addNetworkHandler("sumo.spectate.next", function(client, currentSpectatingElemen
 addNetworkHandler("sumo.client", function(client) {
 	client.setData("sumo.client", true, false);
 	client.setData("sumo.ready", false, true);
-	
+
 	if(matchStarted) {
 		triggerNetworkEvent("sumo.lobby", client,
 			matchMap.info.name || "",
@@ -343,13 +339,13 @@ addNetworkHandler("sumo.client", function(client) {
 
 // ----------------------------------------------------------------------------
 
-addNetworkHandler("sumo.ready", function(client) {	
+addNetworkHandler("sumo.ready", function(client) {
 	triggerEvent("OnPlayerReadyForMatch", client, client);
 });
 
 // ----------------------------------------------------------------------------
 
-addNetworkHandler("sumo.spectator", function(client) {	
+addNetworkHandler("sumo.spectator", function(client) {
 	triggerEvent("OnPlayerSwitchToSpectator", client, client);
 });
 
@@ -371,7 +367,7 @@ addCommandHandler("reload", function(command, params, client) {
 
 // ----------------------------------------------------------------------------
 
-function removePlayerFromMatch(client) {	
+function removePlayerFromMatch(client) {
 	if(remainingPlayers.indexOf(client) == -1) {
 		return false;
 	}
@@ -380,25 +376,25 @@ function removePlayerFromMatch(client) {
 		respawnAsSpectator(client);
 		return;
 	}
-	
-	remainingPlayers.splice(remainingPlayers.indexOf(client), 1);	
-	
+
+	remainingPlayers.splice(remainingPlayers.indexOf(client), 1);
+
 	if(client.player != null) {
 		if(client.player.vehicle != null) {
 			destroyElement(client.player.vehicle);
 		}
 		client.despawnPlayer();
 	}
-	
+
 	if(remainingPlayers.length > 1) {
 		let currentTimestamp = Math.round((new Date()).getTime() / 1000);
-		message(client.name + " died after " + String(currentTimestamp-matchStartTime) + " seconds. " + String(remainingPlayers.length) + " players remain!", COLOUR_YELLOW);			
-		console.log("[SUMO] " + client.name + " died after " + String(currentTimestamp-matchStartTime) + " seconds. " + String(remainingPlayers.length) + " players remain!");
+		message(`${client.name} died after ${currentTimestamp-matchStartTime} seconds. ${remainingPlayers.length} players remain!`, COLOUR_YELLOW);
+		console.log(`[SUMO] ${client.name} died after ${currentTimestamp-matchStartTime} seconds. ${remainingPlayers.length} players remain!`);
 		respawnAsSpectator(client);
 	} else {
 		endMatch();
-	}	
-	
+	}
+
 	client.setData("sumo.spawned", false, true);
 	client.setData("sumo.ready", false, true);
 }
@@ -409,14 +405,14 @@ function respawnAsSpectator(client) {
 	if(client.getData("sumo.spectating") == null) {
 		client.setData("sumo.spectating", true, true);
 	}
-	
+
 	let spawnInfo = getRandomSpectatorSpawn();
 	let spawnPosition = spawnInfo.position;
 	let spawnHeading = Number(spawnInfo.heading);
 	if(!matchMap.info.usesRadians) {
 		spawnHeading = degToRad(spawnHeading);
 	}
-	
+
 	let vehicle = gta.createVehicle(spectatorVehicle[server.game], spawnPosition);
 	vehicle.heading = spawnHeading;
 	addToWorld(vehicle);
@@ -424,12 +420,12 @@ function respawnAsSpectator(client) {
 	if(server.game !== GAME_GTA_SA) {
 		vehicle.engine = false;
 	}
-	
-	spawnPlayer(client, vehicle.position, spawnHeading, sumoSkins[server.game], 0, 0);		
-	client.player.warpIntoVehicle(vehicle, 0);	
-	
-	messageClient("You have been respawned as a spectator", client, COLOUR_YELLOW);
-	console.log("[SUMO] " + client.name + " was respawned as spectator");
+
+	spawnPlayer(client, vehicle.position, spawnHeading, sumoSkins[server.game], 0, 0);
+	client.player.warpIntoVehicle(vehicle, 0);
+
+	messageClient(`You have been respawned as a spectator`, client, COLOUR_YELLOW);
+	console.log(`[SUMO] ${client.name} was respawned as spectator`);
 }
 
 // ----------------------------------------------------------------------------
@@ -444,12 +440,12 @@ function startMatch() {
 	if(server.game !== GAME_GTA_SA) {
 		getElementsByType(ELEMENT_VEHICLE).forEach(v => v.engine = true);
 	}
-	
+
 	matchEndCountdown = Number(matchMap.info.winTime);
-	
+
 	setTimeout(countdownToMatchEnd, 1000);
-	message("Match ends in " + String(matchEndCountdown) + " seconds!", COLOUR_YELLOW);
-	console.log("[SUMO] Match started! Automatically ends in " + String(matchEndCountdown) + " seconds");
+	message(`Match ends in ${matchEndCountdown}`, COLOUR_YELLOW);
+	console.log(`[SUMO] Match started! Automatically ends in ${matchEndCountdown} seconds`);
 }
 
 // ----------------------------------------------------------------------------
@@ -462,12 +458,12 @@ function initMatch() {
 			client.removeData("sumo.spectating");
 		}
 	});
-	
+
 	let mapName = getRandomMap(server.game);
-	console.log("Chose " + String(mapName) + " as new map");
-	
+	console.log(`Chose ${mapName} as new map`);
+
 	loadMapData(mapName, server.game);
-	
+
 	collectAllGarbage();
 }
 
@@ -495,24 +491,17 @@ function getRandomSpectatorSpawn() {
 // ----------------------------------------------------------------------------
 
 function getFileData(filePath) {
-	let file = openFile(filePath, false);
-	if(!file) {
+	let fileData = loadTextFile(filePath);
+	if(!fileData) {
 		return false;
 	}
-	let fileData = file.readBytes(file.length);
-	file.close();
 	return fileData;
 }
 
 // ----------------------------------------------------------------------------
 
 function setFileData(filePath, fileData) {
-	let file = openFile(filePath, true);
-	if(!file) {
-		return false;
-	}
-	file.writeBytes(fileData, fileData.length);
-	file.close();
+	saveTextFile(filePath, fileData);
 	return true;
 }
 
@@ -520,15 +509,15 @@ function setFileData(filePath, fileData) {
 
 function getFileLines(filePath) {
 	let fileData = getFileData(filePath);
-	
+
 	if(!fileData) {
 		return new Array(0);
 	}
-	
+
 	// Fix line endings
 	fileData = fileData.replace("\r\n", "\n");
 	fileData = fileData.replace("\r", "\n");
-	
+
 	return fileData.split("\n") || new Array(0);
 }
 
@@ -537,40 +526,40 @@ function getFileLines(filePath) {
 addEventHandler("OnMapLoaded", function(event, mapData) {
 	matchMap = mapData;
 	isMapLoaded = true;
-	
+
 	remainingSpawns = matchMap.spawns;
-	
+
 	sendAllClientsToLobby();
 });
 
 // ----------------------------------------------------------------------------
 
 function loadMapData(mapName, gameId = server.game) {
-	console.warn("[SUMO] Loading map '" + String(mapName) + "'!");
-	
+	console.warn(`[SUMO] Loading map '${mapName}'!`);
+
 	let usesRadians = doesMapUseRadians(mapName);
-	let mapFilePath = "maps/" + String(gameId) + "/" + String(mapName) + ".ini";
+	let mapFilePath = `maps/${gameId}/${mapName}.ini`;
 	let mapFileData = getFileLines(mapFilePath);
 	if(mapFileData.length == 0) {
-		console.error("[SUMO] Could not load map '" + String(mapName) + ".ini");
+		console.error(`[SUMO] Could not load map '${mapName}.ini`);
 		thisResource.stop();
 		return false;
 	}
-	
+
 	let mapSpawns = [];
 	mapFileData.filter((mapData) => mapData[0] === "S").forEach(function(spawnData) {
 		let position = spawnData.split(" ").slice(1, 4);
 		let heading = spawnData.split(" ")[4];
 		mapSpawns.push({position: new Vec3(Number(position[0]), Number(position[1]), Number(position[2])), heading: heading});
 	});
-	
+
 	let mapObjects = [];
 	mapFileData.filter((mapData) => mapData[0] === "O").forEach(function(objectData) {
 		let thisObject = objectData.split(" ");
 		let model = thisObject[1];
 		let position = thisObject.slice(2, 5);
 		let rotation = thisObject.slice(5, 8);
-		
+
 		let position2 = new Vec3(Number(position[0]), Number(position[1]), Number(position[2]));
 		let rotation2 = new Vec3(Number(rotation[0]), Number(rotation[1]), Number(rotation[2]));
 		let heading = Number(rotation[2]);
@@ -578,24 +567,19 @@ function loadMapData(mapName, gameId = server.game) {
 			rotation2 = new Vec3(degToRad(Number(rotation[0])), degToRad(Number(rotation[1])), degToRad(Number(rotation[2])));
 			heading = degToRad(Number(rotation[2]));
 		}
-		
-		let tempObject = null;
-		if(server.game == GAME_GTA_SA) {
-			tempObject = gta.createObject(Number(model), position2);
+
+		let tempObject = gta.createObject(Number(model), position2);
+		if(tempObject != null) {
 			tempObject.setRotation(rotation2);
-			//tempObject.heading = Number(heading);
-		} else {
-			tempObject = gta.createBuilding(Number(model), position2);
-			tempObject.setRotation(rotation2);
-			//tempObject.heading = Number(heading);
+			tempObject.onAllDimensions = true;
+			addToWorld(tempObject);
+			mapObjects.push(tempObject);
 		}
-		
-		mapObjects.push(tempObject);
 	});
-	
+
 	let cameraPositionData = mapFileData.filter((mapData) => mapData[0] === "C")[0].split(" ");
 	let cameraLookAtData = mapFileData.filter((mapData) => mapData[0] === "L")[0].split(" ");
-	
+
 	let mapData = {
 		info: {
 			name: mapFileData.filter((mapData) => mapData[0] === "N")[0].slice(2),
@@ -611,7 +595,7 @@ function loadMapData(mapName, gameId = server.game) {
 		spawns: mapSpawns,
 		objects: mapObjects,
 	};
-	
+
 	triggerEvent("OnMapLoaded", null, mapData);
 }
 
@@ -630,10 +614,10 @@ addEventHandler("OnPlayerReadyForMatch", function(event, client) {
 		if(client.getData("sumo.ready") == null || !client.getData("sumo.ready")) {
 			client.setData("sumo.ready", true, true);
 			remainingPlayers.push(client);
-			
+
 			console.log("[SUMO] " + String(client.name) + " is ready for the match! (" + String(remainingPlayers.length) + "/" + String(getClients().length) + ")");
 			message(String(client.name) + " is ready for the match! (" + String(remainingPlayers.length) + "/" + String(getClients().length) + ")", COLOUR_YELLOW);
-			
+
 			setTimeout(function() {
 				if(remainingPlayers.length == getClients().length) {
 					console.warn("[SUMO] All players are ready! Beginning match countdown!");
@@ -655,9 +639,9 @@ function getRandomMap(gameId = server.game) {
 		thisResource.stop();
 		return false;
 	}
-	
+
 	let thisGameMaps = mapsFileData.filter((maps) => maps[0] === String(gameId));
-	
+
 	let randomMapId = (thisGameMaps.length > 1) ? Math.floor(Math.random()*thisGameMaps.length) : 0;
 	return thisGameMaps[randomMapId].split(" ")[1];
 }
@@ -686,7 +670,7 @@ function sendAllClientsToLobby() {
 
 // ----------------------------------------------------------------------------
 
-function endMatch() {	
+function endMatch() {
 	if(remainingPlayers.length == 1) {
 		message(String(remainingPlayers[0].name) + " wins " + String(matchMap.info.name) + "!", COLOUR_LIME);
 		console.log("[SUMO] Match ended. Winner is " + remainingPlayers[0].name);
@@ -700,18 +684,18 @@ function endMatch() {
 	getElementsByType(ELEMENT_VEHICLE).forEach(function(vehicle) {
 		destroyElement(vehicle);
 	});
-	
+
 	getClients().forEach(function(client) {
 		if(client.player != null) {
 			client.despawnPlayer();
 		}
-		
+
 		client.removeData("sumo.ready", false, true);
 		client.removeData("sumo.spectating");
 	});
 
 
-	
+
 	matchStarted = false;
 	changeMap();
 	setTimeout(function() { sendAllClientsToLobby(); }, 500);
@@ -737,21 +721,21 @@ function getPosInFrontOfPos(pos, angle, distance) {
 
 // ----------------------------------------------------------------------------
 
-function changeMap(mapName = null) {	
+function changeMap(mapName = null) {
 	getElementsByType(ELEMENT_VEHICLE).forEach(function(vehicle) {
 		destroyElement(vehicle);
-	});	
-	
+	});
+
 	getClients().forEach(function(client) {
 		if(client.player != null) {
 			client.despawnPlayer();
 		}
 	});
-	
+
 	matchObjects.forEach(function(object) {
 		destroyElement(object);
-	});	
-	
+	});
+
 	matchStarted = false;
 	matchStartTime = 0;
 	initMatch();
@@ -774,7 +758,7 @@ function radToDeg(rad) {
 function doesMapUseRadians(mapFileName) {
 	let mapsFileData = getFileLines("maps/maps.ini");
 	let thisGameMaps = mapsFileData.filter((maps) => maps[0] == String(server.game));
-	
+
 	for(let i in thisGameMaps) {
 		let splitInfo = thisGameMaps[i].split(" ");
 		if(splitInfo[1] == mapFileName) {
